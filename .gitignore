@@ -19,3 +19,6 @@ voice-agent/models/*.bin
 
 # --- runtime artifacts ---
 voice-agent/notes.json
+
+# node
+node_modules/

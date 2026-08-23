@@ -147,7 +147,9 @@ const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 // LLM fallback — ask Gemma 31B (via the local bridge) for anything not scripted.
 // Keeps a short history so context carries across turns.
 // ---------------------------------------------------------------------------
-const LLM_URL = "http://localhost:8000/chat";
+// On Vercel this hits the serverless function at /api/chat. For pure-local dev
+// with the Python server, override by setting window.LLM_URL before app.js loads.
+const LLM_URL = window.LLM_URL || "/api/chat";
 let llmHistory = [];
 
 async function askLLM(text) {

@@ -1,0 +1,9 @@
+{
+  "name": "dogathon-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Paws & Co. talking dog adoption assistant — static site + serverless Gemma brain",
+  "dependencies": {
+    "jose": "^5.9.6"
+  }
+}
