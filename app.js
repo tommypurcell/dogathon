@@ -153,16 +153,17 @@ const LLM_URL = window.LLM_URL || "/api/chat";
 let llmHistory = [];
 
 async function askLLM(text) {
+  // NOTE: does not mutate llmHistory itself — the caller (onresult) records
+  // every turn uniformly, whether it was answered by the scripted brain or
+  // the LLM, so context never gets dropped when the two hand off to each other.
   try {
     const r = await fetch(LLM_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text, history: llmHistory.slice(-8) }),
+      body: JSON.stringify({ message: text, history: llmHistory.slice(-12) }),
     });
     if (!r.ok) throw new Error("HTTP " + r.status);
     const data = await r.json();
-    llmHistory.push({ role: "user", content: text });
-    llmHistory.push({ role: "assistant", content: data.reply });
     return data.reply;
   } catch (e) {
     // Bridge not running — degrade gracefully to a helpful scripted line.
@@ -266,6 +267,10 @@ function listen() {
     if (reply === null) {
       reply = await askLLM(said);
     }
+    // Record EVERY turn (scripted or LLM) so context never drops when the two
+    // brains hand off to each other.
+    llmHistory.push({ role: "user", content: said });
+    llmHistory.push({ role: "assistant", content: reply });
     if (!running) return;
     speak(reply, () => { if (running) listen(); });
   };
