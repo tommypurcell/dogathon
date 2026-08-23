@@ -269,15 +269,15 @@ function stopConversation() {
 
 function listen() {
   if (!running || isMuted) return;
-  setState(“listening”);
+  setState("listening");
   recog = new SR();
-  recog.lang = “en-US”;
+  recog.lang = "en-US";
   recog.interimResults = false;
   recog.maxAlternatives = 1;
 
   recog.onresult = async (e) => {
     const said = e.results[0][0].transcript;
-    setState(“thinking”, `”${said}”`);
+    setState("thinking", `"${said}"`);
     // Try the instant scripted brain first; if nothing matches, ask Gemma 31B.
     let reply = respond(said);
     if (reply === null) {
@@ -285,15 +285,15 @@ function listen() {
     }
     // Record EVERY turn (scripted or LLM) so context never drops when the two
     // brains hand off to each other.
-    llmHistory.push({ role: “user”, content: said });
-    llmHistory.push({ role: “assistant”, content: reply });
+    llmHistory.push({ role: "user", content: said });
+    llmHistory.push({ role: "assistant", content: reply });
     if (!running) return;
     speak(reply, () => { if (running) listen(); });
   };
   recog.onerror = (e) => {
     if (!running) return;
-    if (e.error === “no-speech” || e.error === “aborted”) { listen(); return; }
-    els.err.textContent = “Mic error: “ + e.error;
+    if (e.error === "no-speech" || e.error === "aborted") { listen(); return; }
+    els.err.textContent = "Mic error: " + e.error;
   };
   recog.onend = () => { /* handled by onresult/onerror chaining */ };
 
