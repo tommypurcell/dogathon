@@ -103,6 +103,21 @@
     .hint { margin-top: 14px; font-size: 12px; color: #8aa0b8; line-height: 1.5; }
     .hint b { color: #6a819b; }
     .err { color: var(--danger); font-size: 13px; margin-top: 12px; min-height: 16px; }
+    .controls { display: flex; gap: 12px; margin-top: 16px; }
+    .control-btn {
+      flex: 1;
+      border: 2px solid var(--accent);
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 14px; font-weight: 600;
+      color: var(--accent);
+      background: transparent;
+      cursor: pointer;
+      transition: background .15s ease, color .15s ease;
+    }
+    .control-btn:hover:not(:disabled) { background: var(--accent); color: #fff; }
+    .control-btn:disabled { opacity: .5; cursor: default; }
+    .control-btn.active { background: var(--danger); color: #fff; border-color: var(--danger); }
   </style>
 </head>
 <body data-state="idle">
@@ -125,6 +140,11 @@
     <button class="talk-btn" id="talkBtn">
       <span id="btnIcon">🎙️</span><span id="btnLabel">Start talking</span>
     </button>
+
+    <div class="controls">
+      <button class="control-btn" id="muteBtn" disabled>🔊 Mic On</button>
+      <button class="control-btn" id="interruptBtn" disabled>⏸️ Stop</button>
+    </div>
 
     <div class="err" id="err"></div>
     <p class="hint">

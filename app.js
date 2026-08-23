@@ -215,7 +215,11 @@ const els = {
   btnLabel: document.getElementById("btnLabel"),
   btnIcon: document.getElementById("btnIcon"),
   err: document.getElementById("err"),
+  muteBtn: document.getElementById("muteBtn"),
+  interruptBtn: document.getElementById("interruptBtn"),
 };
+
+let isMuted = false;
 
 function setState(s, msg) {
   els.body.dataset.state = s;
@@ -234,34 +238,46 @@ function startConversation() {
     return;
   }
   running = true;
+  isMuted = false;
   els.btn.classList.add("end");
   els.btnLabel.textContent = "End";
   els.btnIcon.textContent = "⏹";
+  els.muteBtn.disabled = false;
+  els.muteBtn.classList.remove("active");
+  els.muteBtn.textContent = "🔊 Mic On";
+  els.interruptBtn.disabled = false;
+  els.interruptBtn.textContent = "⏸️ Stop";
   // Greet first.
   speak("Woof! Hi there, I'm Buddy at Paws and Co. How can I help you find your new best friend?", listen);
 }
 
 function stopConversation() {
   running = false;
+  isMuted = false;
   try { recog && recog.stop(); } catch (e) {}
   speechSynthesis.cancel();
   els.btn.classList.remove("end");
   els.btnLabel.textContent = "Start talking";
   els.btnIcon.textContent = "🎙️";
+  els.muteBtn.disabled = true;
+  els.muteBtn.classList.remove("active");
+  els.muteBtn.textContent = "🔊 Mic On";
+  els.interruptBtn.disabled = true;
+  els.interruptBtn.textContent = "⏸️ Stop";
   setState("idle");
 }
 
 function listen() {
-  if (!running) return;
-  setState("listening");
+  if (!running || isMuted) return;
+  setState(“listening”);
   recog = new SR();
-  recog.lang = "en-US";
+  recog.lang = “en-US”;
   recog.interimResults = false;
   recog.maxAlternatives = 1;
 
   recog.onresult = async (e) => {
     const said = e.results[0][0].transcript;
-    setState("thinking", `“${said}”`);
+    setState(“thinking”, `”${said}”`);
     // Try the instant scripted brain first; if nothing matches, ask Gemma 31B.
     let reply = respond(said);
     if (reply === null) {
@@ -269,15 +285,15 @@ function listen() {
     }
     // Record EVERY turn (scripted or LLM) so context never drops when the two
     // brains hand off to each other.
-    llmHistory.push({ role: "user", content: said });
-    llmHistory.push({ role: "assistant", content: reply });
+    llmHistory.push({ role: “user”, content: said });
+    llmHistory.push({ role: “assistant”, content: reply });
     if (!running) return;
     speak(reply, () => { if (running) listen(); });
   };
   recog.onerror = (e) => {
     if (!running) return;
-    if (e.error === "no-speech" || e.error === "aborted") { listen(); return; }
-    els.err.textContent = "Mic error: " + e.error;
+    if (e.error === “no-speech” || e.error === “aborted”) { listen(); return; }
+    els.err.textContent = “Mic error: “ + e.error;
   };
   recog.onend = () => { /* handled by onresult/onerror chaining */ };
 
@@ -287,6 +303,32 @@ function listen() {
 els.btn.addEventListener("click", () => {
   if (!DOGS.length) return;  // wait until the dog data has loaded
   running ? stopConversation() : startConversation();
+});
+
+els.muteBtn.addEventListener("click", () => {
+  if (!running) return;
+  isMuted = !isMuted;
+  if (isMuted) {
+    try { recog && recog.stop(); } catch (e) {}
+    els.muteBtn.classList.add("active");
+    els.muteBtn.textContent = "🔇 Mic Muted";
+    setState("idle", "Mic muted");
+  } else {
+    els.muteBtn.classList.remove("active");
+    els.muteBtn.textContent = "🔊 Mic On";
+    listen();
+  }
+});
+
+els.interruptBtn.addEventListener("click", () => {
+  if (!running) return;
+  speechSynthesis.cancel();
+  try { recog && recog.stop(); } catch (e) {}
+  isMuted = false;
+  els.muteBtn.classList.remove("active");
+  els.muteBtn.textContent = "🔊 Mic On";
+  setState("idle", "Interrupted—go ahead");
+  listen();
 });
 
 // Some browsers load voices async.
