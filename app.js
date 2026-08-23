@@ -13,46 +13,6 @@ function findDog(text) {
   return DOGS.find(d => t.includes(d.name.toLowerCase())) || null;
 }
 
-// Common spoken shorthands -> a word that appears in the real breed string.
-// Lets "lab", "golden", "corgi", etc. match the right dog(s), data-driven.
-const BREED_ALIASES = {
-  lab: "labrador", pup: "puppy",
-  golden: "retriever", german: "shepherd",
-  husky: "siberian", poodle: "poodle", doodle: "poodle",
-};
-
-// Match dogs by breed words the user might say (handles "golden", "lab", etc.).
-function findByBreed(text) {
-  const t = text.toLowerCase();
-  const matches = [];
-  const add = (d) => { if (d && !matches.includes(d)) matches.push(d); };
-
-  // 1) Match any word of each dog's breed string ("golden retriever" -> golden, retriever).
-  for (const d of DOGS) {
-    const words = d.breed.toLowerCase().split(/\s+/).filter(w => w.length > 3 && w !== "mix");
-    if (words.some(w => t.includes(w))) add(d);
-  }
-  // 2) Match spoken aliases ("lab" -> labrador, "golden" -> retriever).
-  for (const [alias, breedWord] of Object.entries(BREED_ALIASES)) {
-    if (t.includes(alias)) {
-      DOGS.forEach(d => { if (d.breed.toLowerCase().includes(breedWord)) add(d); });
-    }
-  }
-  return matches;
-}
-
-// Match by trait words (size / energy) so "small dog", "calm", "high energy" work.
-function findByTrait(text) {
-  const t = text.toLowerCase();
-  let list = [...DOGS];
-  if (/\b(small|little|tiny|lap)\b/.test(t)) list = list.filter(d => d.size === "small");
-  else if (/\b(big|large)\b/.test(t)) list = list.filter(d => d.size === "large");
-  if (/\b(calm|mellow|low.?energy|relaxed|chill|lazy|quiet)\b/.test(t)) list = list.filter(d => d.energy === "low");
-  else if (/\b(active|high.?energy|energetic|playful|hyper|runs?)\b/.test(t)) list = list.filter(d => d.energy === "high");
-  else if (/\b(puppy|puppies|young)\b/.test(t)) list = list.filter(d => /puppy|months/i.test(d.age) || /puppy/i.test(d.breed));
-  return list.length && list.length < DOGS.length ? list : null;
-}
-
 // Simple conversational memory so "book it" / "yes" knows which dog.
 let context = { dog: null, offeredSlots: null };
 
@@ -67,8 +27,14 @@ function respond(text) {
   // 1) Booking confirmation ("yes", "book it", "add me", "sounds good")
   if (/\b(yes|yeah|sure|book|schedule me|add me|sounds good|let's do|do it|first one|that works)\b/.test(t)
       && context.dog && context.offeredSlots) {
-    // pick the slot they named, else the first offered
-    let slot = context.offeredSlots.find(s => t.includes(s.split(" ")[0].toLowerCase()));
+    // pick the slot they named (by day, time, or "first"/"second"), else the first offered
+    const ordinals = ["first", "second", "third"];
+    const ordinalIdx = ordinals.findIndex(w => t.includes(w));
+    let slot = ordinalIdx >= 0 ? context.offeredSlots[ordinalIdx] : undefined;
+    if (!slot) {
+      slot = context.offeredSlots.find(s =>
+        s.toLowerCase().split(/\s+/).some(word => word.length > 2 && t.includes(word)));
+    }
     if (!slot) slot = context.offeredSlots[0];
     context.offeredSlots = null;
     return `You're all set! I've booked you to meet ${context.dog.name} on ${slot}. ` +
@@ -91,49 +57,10 @@ function respond(text) {
            `Would you like to schedule a time to meet ${d.name}?`;
   }
 
-  // 3b) Asking about a breed ("do you have any golden retrievers?")
-  const byBreed = findByBreed(t);
-  if (byBreed.length) {
-    if (byBreed.length === 1) {
-      const d = byBreed[0];
-      context.dog = d;
-      return `Yes! We have ${d.name}, a ${d.age} ${d.breed} — ${d.blurb}. ` +
-             `Would you like to meet ${d.name}?`;
-    }
-    const names = byBreed.map(d => `${d.name} the ${d.breed}`).join(", and ");
-    return `Yes! We have ${names}. Want to hear more about either one?`;
-  }
-
-  // 3c) Asking by trait ("a small calm dog", "high energy pup")
-  const byTrait = findByTrait(t);
-  if (byTrait) {
-    if (byTrait.length === 1) {
-      const d = byTrait[0];
-      context.dog = d;
-      return `${d.name} sounds perfect for you — a ${d.age} ${d.breed}, ${d.blurb}. ` +
-             `Would you like to meet ${d.name}?`;
-    }
-    const names = byTrait.map(d => d.name).join(" and ");
-    return `Sounds like ${names} would be a great fit. Want details on either one?`;
-  }
-
-  // 4) Looking for a family dog / good with kids
-  if (/\b(family|kids?|children|good with|gentle|first dog|beginner)\b/.test(t)) {
-    const family = DOGS.filter(d => d.kids);
-    const names = family.map(d => `${d.name}, a ${d.breed}`).join("; ");
-    return `We have some wonderful family dogs! There's ${names}. ` +
-           `Max is an especially gentle pick. Want to hear more about any of them?`;
-  }
-
-  // 5) General "what do you have"
-  if (/\b(what|which|any|available|adopt|looking for|show me|dogs?)\b/.test(t)) {
-    const names = DOGS.map(d => d.name).join(", ");
-    return `Right now we have ${names}. Are you looking for anything in particular — ` +
-           `like a calm family dog, or a high-energy pup?`;
-  }
-
-  // 6) Greetings / fallback
-  if (/\b(hi|hello|hey|woof|there)\b/.test(t)) {
+  // 6) Greetings only — everything else (breed/trait/family/"what dogs do you
+  // have" questions) goes to the LLM brain, which has real tool access to the
+  // same data and won't repeat the same canned sentence every time.
+  if (/^\s*(hi|hello|hey|woof)\b/.test(t)) {
     return `Woof! Hi there, I'm Buddy, the office helper here at Paws and Co. ` +
            `Are you looking to adopt a furry friend today?`;
   }
@@ -207,6 +134,12 @@ function speak(text, onEnd) {
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recog = null;
 let running = false;
+// Bumped every time listen() starts a new recognition session. Old sessions'
+// onresult/onerror/onend are closures that can still fire asynchronously
+// after being stopped/replaced (e.g. mute/interrupt racing a restart) — each
+// callback checks it's still the current generation before acting, so a
+// stale session can never double-process an utterance or spawn a duplicate.
+let recogGen = 0;
 
 const els = {
   body: document.body,
@@ -254,7 +187,7 @@ function startConversation() {
 function stopConversation() {
   running = false;
   isMuted = false;
-  try { recog && recog.stop(); } catch (e) {}
+  forceStopRecog();
   speechSynthesis.cancel();
   els.btn.classList.remove("end");
   els.btnLabel.textContent = "Start talking";
@@ -269,6 +202,10 @@ function stopConversation() {
 
 function listen() {
   if (!running || isMuted) return;
+  // A prior session is still shutting down — let its onerror/onend chain
+  // decide whether to restart, instead of stacking a second live recognizer.
+  if (recog) return;
+  const myGen = ++recogGen;
   setState("listening");
   recog = new SR();
   recog.lang = "en-US";
@@ -276,6 +213,8 @@ function listen() {
   recog.maxAlternatives = 1;
 
   recog.onresult = async (e) => {
+    if (myGen !== recogGen) return;  // stale session — a newer one has taken over
+    recog = null;
     const said = e.results[0][0].transcript;
     setState("thinking", `"${said}"`);
     // Try the instant scripted brain first; if nothing matches, ask Gemma 31B.
@@ -291,13 +230,28 @@ function listen() {
     speak(reply, () => { if (running) listen(); });
   };
   recog.onerror = (e) => {
+    if (myGen !== recogGen) return;  // stale session — ignore
+    recog = null;
     if (!running) return;
     if (e.error === "no-speech" || e.error === "aborted") { listen(); return; }
     els.err.textContent = "Mic error: " + e.error;
   };
-  recog.onend = () => { /* handled by onresult/onerror chaining */ };
+  recog.onend = () => {
+    if (myGen !== recogGen) return;  // stale session — ignore
+    recog = null;
+  };
 
   try { recog.start(); } catch (e) { /* already started */ }
+}
+
+// Stops any in-flight recognition and immediately invalidates it, so its
+// (still-pending, async) onresult/onerror/onend can never act — the caller
+// is free to call listen() again right away without racing the old session.
+function forceStopRecog() {
+  recogGen++;
+  const old = recog;
+  recog = null;
+  try { old && old.stop(); } catch (e) {}
 }
 
 els.btn.addEventListener("click", () => {
@@ -309,7 +263,7 @@ els.muteBtn.addEventListener("click", () => {
   if (!running) return;
   isMuted = !isMuted;
   if (isMuted) {
-    try { recog && recog.stop(); } catch (e) {}
+    forceStopRecog();
     els.muteBtn.classList.add("active");
     els.muteBtn.textContent = "🔇 Mic Muted";
     setState("idle", "Mic muted");
@@ -323,7 +277,7 @@ els.muteBtn.addEventListener("click", () => {
 els.interruptBtn.addEventListener("click", () => {
   if (!running) return;
   speechSynthesis.cancel();
-  try { recog && recog.stop(); } catch (e) {}
+  forceStopRecog();
   isMuted = false;
   els.muteBtn.classList.remove("active");
   els.muteBtn.textContent = "🔊 Mic On";
