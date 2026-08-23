@@ -31,7 +31,8 @@ from livekit import api
 import datetime
 
 # --- credentials from the voice-agent's .env ---
-_ENV = pathlib.Path(__file__).parent.parent / "voice-agent" / ".env"
+# server.py sits at the repo root; the agent's .env is in ./voice-agent/.
+_ENV = pathlib.Path(__file__).parent / "voice-agent" / ".env"
 load_dotenv(_ENV)
 KEY = os.getenv("LIVEKIT_API_KEY", "")
 SECRET = os.getenv("LIVEKIT_API_SECRET", "")

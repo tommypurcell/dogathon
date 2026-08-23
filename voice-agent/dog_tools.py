@@ -15,8 +15,8 @@ from livekit.agents import function_tool, RunContext
 # --------------------------------------------------------------------------- #
 # Data — load the adoptable dogs from the shared web/dogs.json.
 # --------------------------------------------------------------------------- #
-# dog_tools.py lives in .../Dogathon/voice-agent, dogs.json in .../Dogathon/web.
-_DOGS_JSON = Path(__file__).resolve().parent.parent / "web" / "dogs.json"
+# dog_tools.py lives in .../Dogathon/voice-agent; dogs.json is at the repo root.
+_DOGS_JSON = Path(__file__).resolve().parent.parent / "dogs.json"
 
 _FALLBACK_DOGS = [
     {
