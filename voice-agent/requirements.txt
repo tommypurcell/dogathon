@@ -1,0 +1,19 @@
+# --- LiveKit Agents (all-local voice assistant) ---
+# Pinned to the 1.7.x line verified live on PyPI (2026-08-21).
+livekit-agents~=1.7
+livekit-plugins-openai~=1.7        # used ONLY for openai.LLM.with_ollama() -> local Ollama
+livekit-plugins-silero~=1.7        # local VAD (voice activity detection + turn detection)
+
+# --- Local STT / TTS backends (bridged via custom adapters) ---
+faster-whisper~=1.2               # local speech-to-text (CTranslate2 Whisper)
+kokoro-onnx~=0.6                   # local text-to-speech (Kokoro via ONNX)
+soundfile                          # audio decoding helper for TTS resampling
+numpy
+
+# --- misc ---
+python-dotenv
+aiohttp                            # used by the web_search tool
+
+# --- testing ---
+pytest
+pytest-asyncio

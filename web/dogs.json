@@ -1,0 +1,123 @@
+[
+  {
+    "name": "Max",
+    "breed": "Golden Retriever",
+    "age": "3 years",
+    "size": "large",
+    "kids": true,
+    "energy": "medium",
+    "photo": "assets/dog-golden.png",
+    "blurb": "a gentle, family-friendly gentleman who loves fetch and nap time",
+    "slots": ["Tuesday from 12 to 2 PM", "Thursday from 3 to 5 PM"]
+  },
+  {
+    "name": "Scout",
+    "breed": "Appenzeller Mix",
+    "age": "2 years",
+    "size": "medium",
+    "kids": true,
+    "energy": "high",
+    "photo": "assets/dog-appenzeller.png",
+    "blurb": "a beach-loving adventurer, always up for a hike and a swim",
+    "slots": ["Wednesday from 10 AM to noon", "Saturday from 1 to 3 PM"]
+  },
+  {
+    "name": "Biscuit",
+    "breed": "Boston Terrier Mix",
+    "age": "5 years",
+    "size": "small",
+    "kids": true,
+    "energy": "low",
+    "photo": "assets/dog-boston.png",
+    "blurb": "a mellow cuddle-bug, happiest on the couch — a great first dog",
+    "slots": ["Monday from 2 to 4 PM", "Friday from 11 AM to 1 PM"]
+  },
+  {
+    "name": "Rocky",
+    "breed": "Labrador Puppy",
+    "age": "5 months",
+    "size": "medium",
+    "kids": true,
+    "energy": "high",
+    "photo": "assets/dog-lab-puppy.png",
+    "blurb": "a splashy little water pup, playful and eager to learn",
+    "slots": ["Thursday from 12 to 2 PM", "Sunday from 10 AM to noon"]
+  },
+  {
+    "name": "Daisy",
+    "breed": "Beagle",
+    "age": "4 years",
+    "size": "small",
+    "kids": true,
+    "energy": "medium",
+    "photo": "assets/new-beagle.jpg",
+    "blurb": "a curious, floppy-eared sweetheart who follows her nose everywhere",
+    "slots": ["Monday from 10 AM to noon", "Wednesday from 2 to 4 PM"]
+  },
+  {
+    "name": "Cooper",
+    "breed": "Corgi",
+    "age": "2 years",
+    "size": "small",
+    "kids": true,
+    "energy": "medium",
+    "photo": "assets/new-corgi-cardigan.jpg",
+    "blurb": "a stubby-legged charmer with a big personality and bigger ears",
+    "slots": ["Tuesday from 3 to 5 PM", "Saturday from 11 AM to 1 PM"]
+  },
+  {
+    "name": "Pepper",
+    "breed": "Dalmatian",
+    "age": "3 years",
+    "size": "large",
+    "kids": true,
+    "energy": "high",
+    "photo": "assets/new-dalmatian.jpg",
+    "blurb": "a spotted bundle of energy who loves to run and show off",
+    "slots": ["Thursday from 10 AM to noon", "Sunday from 1 to 3 PM"]
+  },
+  {
+    "name": "Koda",
+    "breed": "Siberian Husky",
+    "age": "4 years",
+    "size": "large",
+    "kids": false,
+    "energy": "high",
+    "photo": "assets/new-husky.jpg",
+    "blurb": "a talkative snow-lover who needs room to run — best with active adults",
+    "slots": ["Wednesday from 12 to 2 PM", "Saturday from 3 to 5 PM"]
+  },
+  {
+    "name": "Bailey",
+    "breed": "Labrador Retriever",
+    "age": "6 years",
+    "size": "large",
+    "kids": true,
+    "energy": "low",
+    "photo": "assets/new-labrador.jpg",
+    "blurb": "a calm, loyal senior who just wants a warm spot and a good belly rub",
+    "slots": ["Monday from 1 to 3 PM", "Friday from 10 AM to noon"]
+  },
+  {
+    "name": "Coco",
+    "breed": "Toy Poodle",
+    "age": "1 year",
+    "size": "small",
+    "kids": true,
+    "energy": "medium",
+    "photo": "assets/new-poodle-toy.jpg",
+    "blurb": "a tiny, clever cloud of curls — smart, gentle, and hypoallergenic",
+    "slots": ["Tuesday from 10 AM to noon", "Thursday from 1 to 3 PM"]
+  },
+  {
+    "name": "Otis",
+    "breed": "Pug",
+    "age": "5 years",
+    "size": "small",
+    "kids": true,
+    "energy": "low",
+    "photo": "assets/new-pug.jpg",
+    "blurb": "a wrinkly, snorty couch potato who lives for snacks and snuggles",
+    "slots": ["Wednesday from 3 to 5 PM", "Sunday from 11 AM to 1 PM"]
+  }
+]

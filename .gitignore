@@ -1,0 +1,21 @@
+# --- secrets (NEVER commit) ---
+.env
+*.env
+!.env.example
+
+# --- python ---
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# --- large model files (re-download; see README) ---
+voice-agent/models/*.onnx
+voice-agent/models/*.bin
+
+# --- os / editor ---
+.DS_Store
+*.log
+
+# --- runtime artifacts ---
+voice-agent/notes.json

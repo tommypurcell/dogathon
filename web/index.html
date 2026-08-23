@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Paws &amp; Co. — Adopt a dog</title>
+  <style>
+    :root {
+      --blue-bg-1: #eaf3ff;
+      --blue-bg-2: #d3e6ff;
+      --ink: #17324d;
+      --muted: #6a819b;
+      --accent: #2f6fed;
+      --accent-dark: #1e4fb0;
+      --card: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      background: radial-gradient(120% 90% at 50% 0%, var(--blue-bg-1), var(--blue-bg-2));
+      color: var(--ink);
+      min-height: 100dvh;
+      -webkit-font-smoothing: antialiased;
+      padding: 40px 24px 64px;
+    }
+    .wrap { max-width: 1040px; margin: 0 auto; }
+
+    /* Header */
+    header { text-align: center; margin-bottom: 40px; }
+    .brand {
+      font-size: 13px; font-weight: 800; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--accent);
+    }
+    h1 { font-size: 40px; font-weight: 800; margin-top: 6px; line-height: 1.1; }
+    .tagline { color: var(--muted); font-size: 16px; margin-top: 10px; }
+    .talk-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 22px;
+      background: var(--accent); color: #fff; text-decoration: none;
+      font-size: 15px; font-weight: 700;
+      padding: 12px 22px; border-radius: 999px;
+      box-shadow: 0 8px 20px rgba(47,111,237,.3), inset 0 1px 0 rgba(255,255,255,.25);
+      transition: transform .08s ease, background .2s ease;
+    }
+    .talk-link:hover { background: var(--accent-dark); }
+    .talk-link:active { transform: scale(.98); }
+
+    /* Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 22px;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(23,50,77,.12), 0 2px 6px rgba(23,50,77,.06);
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 44px rgba(23,50,77,.18), 0 2px 6px rgba(23,50,77,.06);
+    }
+    .photo {
+      width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block;
+      background: linear-gradient(180deg, var(--blue-bg-1), var(--blue-bg-2));
+    }
+    .body { padding: 16px 18px 20px; }
+    .name { font-size: 20px; font-weight: 800; }
+    .breed { color: var(--muted); font-size: 14px; margin-top: 2px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .tag {
+      font-size: 12px; font-weight: 600;
+      color: var(--accent-dark); background: #eaf1ff;
+      padding: 4px 10px; border-radius: 999px;
+    }
+    .adopt {
+      margin-top: 16px; width: 100%;
+      border: none; border-radius: 12px;
+      padding: 11px; font-size: 14px; font-weight: 700;
+      color: var(--accent); background: #eaf1ff;
+      cursor: pointer; transition: background .15s ease, color .15s ease;
+    }
+    .adopt:hover { background: var(--accent); color: #fff; }
+
+    footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 48px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">Paws &amp; Co. Adoptions</div>
+      <h1>Meet your new best friend</h1>
+      <p class="tagline">Every one of these good dogs is looking for a home.</p>
+      <a class="talk-link" href="helper.html">🎙️ Talk to our Office Helper</a>
+    </header>
+
+    <main class="grid" id="grid"></main>
+
+    <footer>Paws &amp; Co. · Open daily 10 AM – 6 PM</footer>
+  </div>
+
+  <script>
+    const grid = document.getElementById("grid");
+    const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+    fetch("dogs.json")
+      .then((r) => r.json())
+      .then((dogs) => {
+        grid.innerHTML = dogs.map((d) => `
+          <article class="card">
+            <img class="photo" src="${d.photo}" alt="${d.name}, a ${d.breed}"
+                 onerror="this.style.display='none'" />
+            <div class="body">
+              <div class="name">${d.name}</div>
+              <div class="breed">${d.breed}</div>
+              <div class="tags">
+                <span class="tag">${d.age}</span>
+                <span class="tag">${cap(d.size)}</span>
+                <span class="tag">${cap(d.energy)} energy</span>
+                ${d.kids ? '<span class="tag">Good with kids</span>' : ""}
+              </div>
+              <button class="adopt" onclick="location.href='helper.html'">Meet ${d.name} →</button>
+            </div>
+          </article>
+        `).join("");
+      })
+      .catch(() => {
+        grid.innerHTML = '<p style="color:var(--muted)">Couldn\'t load our dogs. Please refresh.</p>';
+      });
+  </script>
+</body>
+</html>
